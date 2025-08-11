@@ -4,4 +4,4 @@ An Open-CV and Tesseract-OCR based script for automating tasks in the Swordsman(
 
 ## Requirements
 - Grab a Tesseract-OCR engine from its [GitHub repository](https://github.com/tesseract-ocr/tessdoc).
-- Import the Conda environment from the [jxsj.yml](jxsj.yml) file.
+- Import the Conda environment from the [jxsj.yml](./jxsj.yml) file.
