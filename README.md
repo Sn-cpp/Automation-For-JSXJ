@@ -1,4 +1,4 @@
-# Automation For JXSJ
+# Automation For JSXJ
 ## Description
 An Open-CV and Tesseract-OCR based script for automating tasks in the Swordsman([Kiếm Thế](https://kiemthe.vnggames.com/)) game by Kingsoft and VNG.
 
