@@ -73,15 +73,15 @@ class DailyTask(Procedure):
             ], ProgressEnum.GOTO_BASE, False),
             ProgressEnum.GOTO_BASE: ([
                 SingleAction(interface.press, function_params=['2']),
-                BranchingAction(interface.detect_dialog, lambda: True, self.raise_tolerance, condition_params=[SignalTypeEnum.NPC_DIALOG], branch_b_params=[self.goto_state, (None, 1)] ),
+                BranchingAction(interface.detect_dialog, lambda: True, self.raise_tolerance, condition_params=[SignalTypeEnum.NPC_DIALOG], branch_b_params=[self.goto_state, (None, 0)] ),
                 SingleAction(interface.click_from_center, function_params=[-327, -110]),
-                BranchingAction(interface.detect_dialog, lambda: True, self.raise_tolerance, condition_params=[SignalTypeEnum.NPC_DIALOG], branch_b_params=[self.goto_state, (None, 1)] ),
+                BranchingAction(interface.detect_dialog, lambda: True, self.raise_tolerance, condition_params=[SignalTypeEnum.NPC_DIALOG], branch_b_params=[self.goto_state, (None, 00)] ),
                 SingleAction(interface.click_from_center, function_params=[-309, 21]),
                 SingleAction(interface.set_timer)
             ], ProgressEnum.REACH_BASE, True),
             ProgressEnum.REACH_BASE: ([
                 SingleAction(interface.elapse, function_params=[11]),
-                BranchingAction(interface.check_location, lambda: True, lambda params: interface.set_timer() and self.raise_tolerance(*params), condition_params=['Đạo Hương Thôn'], branch_b_params=[self.goto_state, (ProgressEnum.GOTO_BASE, 0)])
+                BranchingAction(interface.check_location, lambda: True, lambda params: interface.set_timer() and self.raise_tolerance(*params), condition_params=['Đạo Hương Thôn'], branch_b_params=[(self.goto_state, (ProgressEnum.GOTO_BASE, 0))])
             ], ProgressEnum.GOTO_NPC_2, False),
             ProgressEnum.GOTO_NPC_2: ([
                 SingleAction(interface.get_on_horse),

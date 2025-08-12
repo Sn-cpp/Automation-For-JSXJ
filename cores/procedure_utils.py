@@ -40,7 +40,7 @@ class Procedure:
         self.step = None
 
         self.tolerance = 0
-        self.max_tol = 10
+        self.max_tol = 4
 
     def execute(self):
         if self.progress[self.stage][0][self.step].execute():
@@ -60,8 +60,6 @@ class Procedure:
             self.step = step 
 
     def raise_tolerance(self, callback, params):
-        super().__init__()
-
         self.tolerance += 1
         if self.tolerance == self.max_tol:
             self.tolerance = 0
