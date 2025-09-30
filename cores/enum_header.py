@@ -5,7 +5,7 @@ class SignalTypeEnum(Enum):
     TASK_MARK = 2
     REWARD = 3
 
-class GreenTextTypeEnum(Enum):
-    NORMAL = 1
-    COORDINATE = 2
-
+class HSVMaskEnum(Enum):
+    NORMAL_GREEN_TEXT = 1
+    COORDINATE_TEXT = 2
+    MOB_DOT = 3

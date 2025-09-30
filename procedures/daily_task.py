@@ -21,6 +21,7 @@ class ProgressEnum(Enum):
         GOTO_NPC_2 = 11
         REACH_NPC_2 = 12
         RETURN_TASK = 13
+        FAIL_RETURN_HANDLING = 14
 
 class DailyTask(Procedure):
     def __init__(self, interface: GameInteface, num: int):
@@ -67,7 +68,7 @@ class DailyTask(Procedure):
                 SingleAction(interface.set_timer)
             ], ProgressEnum.AWAIT_COMPLETE, True),
             ProgressEnum.AWAIT_COMPLETE: ([
-                SingleAction(interface.elapse, function_params=[5]),
+                SingleAction(interface.elapse, function_params=[10]),
                 SingleAction(interface.press, function_params=['f4']),
                 BranchingAction(interface.is_task_complete, lambda: True, lambda : interface.set_timer() and self.goto_state(step=0) )
             ], ProgressEnum.GOTO_BASE, False),
@@ -81,7 +82,7 @@ class DailyTask(Procedure):
             ], ProgressEnum.REACH_BASE, True),
             ProgressEnum.REACH_BASE: ([
                 SingleAction(interface.elapse, function_params=[11]),
-                BranchingAction(interface.check_location, lambda: True, lambda params: interface.set_timer() and self.raise_tolerance(*params), condition_params=['Đạo Hương Thôn'], branch_b_params=[(self.goto_state, (ProgressEnum.GOTO_BASE, 0))])
+                BranchingAction(interface.check_location, lambda: True, lambda params: self.raise_tolerance(*params), condition_params=['Đạo Hương Thôn'], branch_b_params=[(self.goto_state, (ProgressEnum.FAIL_RETURN_HANDLING, 0))])
             ], ProgressEnum.GOTO_NPC_2, False),
             ProgressEnum.GOTO_NPC_2: ([
                 SingleAction(interface.get_on_horse),
@@ -98,7 +99,14 @@ class DailyTask(Procedure):
                 SingleAction(interface.click_from_center, function_params=[-153, 185]),
                 SingleAction(interface.click_from_center, function_params=[68, 275]),
                 SingleAction(interface.click_from_center, self.reduce_task_count,  function_params=[0, -25]),
-            ], ProgressEnum.RECEIVE_TASK, True)
+            ], ProgressEnum.RECEIVE_TASK, True),
+            ProgressEnum.FAIL_RETURN_HANDLING: ([
+                SingleAction(interface.click_center),
+                SingleAction(interface.press, function_params=['f']),
+                SingleAction(interface.set_timer),
+                SingleAction(interface.elapse, function_params=[3]),
+                SingleAction(interface.press, function_params=['f'])
+            ], ProgressEnum.GOTO_BASE)
         }
         
     def reduce_task_count(self):

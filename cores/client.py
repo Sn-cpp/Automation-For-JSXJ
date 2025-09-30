@@ -16,8 +16,13 @@ class Client:
         self.current_process = DailyTask(self.ui, num)
 
     def execute(self):
+        """
+            Return:
+                + True -> task completed
+                + False -> task undone
+        """
         if self.current_process.count <= 0:
-            return
+            return True
         
         self.set_active()
         pyg.sleep(0.3)
@@ -31,6 +36,8 @@ class Client:
             if kb.is_pressed('space'):
                 break
             pass
+
+        return False
 
     def set_active(self):
         pyg.press('alt')

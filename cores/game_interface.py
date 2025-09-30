@@ -8,7 +8,7 @@ import cv2
 from assets.assets_loader import Assets
 from cores.utils import Util
 
-from cores.enum_header import SignalTypeEnum, GreenTextTypeEnum
+from cores.enum_header import SignalTypeEnum, HSVMaskEnum
 
 from difflib import SequenceMatcher
 
@@ -270,7 +270,7 @@ class GameInteface:
                 pyg.press('f4')
                 pyg.press('tab')
                 pyg.sleep(0.2)
-                self.click_from_center(337, 62)
+                self.click_from_center(337, 60)
                 self.reach = False
                 pyg.press('tab')
                 pyg.sleep(0.2)
@@ -303,8 +303,15 @@ class GameInteface:
         if text != None and '24/' in text:
             return True
         
-        pyg.sleep(0.3)
+
+        mean_dot = Util.locate_mob_dot(self.screenshot[75: 175, -130:-30])
+
+        if mean_dot != None:
+            pyg.click(self.left + self.width - 130 + mean_dot[0], self.top + 75 + mean_dot[1])
+            pyg.sleep(1)
+            
         pyg.press('f')
+ 
         return False
     
     def get_on_horse(self):

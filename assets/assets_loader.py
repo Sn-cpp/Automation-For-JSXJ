@@ -8,3 +8,4 @@ class Assets:
     NpcFlag_L = imread('./assets/signal/npc_flag_2.png', 0)
     PositionFlag = imread('./assets/signal/position_flag.png', 0)
     FameReward = imread('./assets/rewards/fame.png', 0)
+    MobDot = imread('./assets/signal/mob_dot.png', 0)
