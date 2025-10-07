@@ -3,7 +3,7 @@ import keyboard as kb
 import numpy as np
 import cv2
 from pytesseract import image_to_string
-import pyautogui as pyg
+from time import sleep
 
 from assets.assets_loader import Assets
 from cores.enum_header import HSVMaskEnum
@@ -25,12 +25,12 @@ class Util:
                 break
             pass
         print("Selected client: ", GetWindowText(client))
-        pyg.sleep(0.5)
+        sleep(0.5)
         return client
 
     def process_green_text(roi: np.ndarray, text_type: HSVMaskEnum = HSVMaskEnum.NORMAL_GREEN_TEXT):
-        # upscale_roi = cv2.resize(cv2.cvtColor(roi, cv2.COLOR_BGR2HSV), (int(roi.shape[1] * 8), int(roi.shape[0] * 8)), interpolation=cv2.INTER_CUBIC)
-        upscale_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+        # upscale_roi = cv2.resize(cv2.cvtColor(roi, cv2.COLOR_RGB2HSV), (int(roi.shape[1] * 8), int(roi.shape[0] * 8)), interpolation=cv2.INTER_CUBIC)
+        upscale_roi = cv2.cvtColor(roi, cv2.COLOR_RGB2HSV)
         return cv2.bitwise_not(cv2.inRange(upscale_roi, *Util.HSVMask[text_type]))
 
     def read_green_text(roi: np.ndarray):
@@ -47,7 +47,7 @@ class Util:
         return roi_x, roi_y
 
     def read_red_text(roi: np.ndarray):
-        resize = cv2.resize(cv2.cvtColor(roi, cv2.COLOR_BGR2HSV), (int(roi.shape[1] * 8), int(roi.shape[0] * 8)), interpolation=cv2.INTER_CUBIC)
+        resize = cv2.resize(cv2.cvtColor(roi, cv2.COLOR_RGB2HSV), (int(roi.shape[1] * 8), int(roi.shape[0] * 8)), interpolation=cv2.INTER_CUBIC)
         roi_threshold = cv2.inRange(resize, (0, 140, 108), (180, 255, 255))
 
         try:
@@ -57,7 +57,7 @@ class Util:
             return None
 
     def read_mission_text(roi: np.ndarray):
-        upscale = cv2.resize(cv2.cvtColor(roi, cv2.COLOR_BGR2HSV), (int(roi.shape[1] * 8), int(roi.shape[0] * 8)), interpolation=cv2.INTER_CUBIC)
+        upscale = cv2.resize(cv2.cvtColor(roi, cv2.COLOR_RGB2HSV), (int(roi.shape[1] * 8), int(roi.shape[0] * 8)), interpolation=cv2.INTER_CUBIC)
         threshold = cv2.inRange(upscale, (0, 170, 95), (180, 255, 255))
         
         try:
@@ -66,9 +66,6 @@ class Util:
         except:
             return None
 
-    def screenshot(region: tuple[int, int, int, int]):
-        return np.asarray(pyg.screenshot(region=region))
-
     def normalize_client_rect(rect: list[int, int, int, int]):
         rect[0] += 9
         rect[1] += 39
@@ -76,7 +73,7 @@ class Util:
         rect[3] -= 9
 
     def locate_img(img: np.ndarray, template: np.ndarray):
-        res = cv2.matchTemplate(img, cv2.cvtColor(template, cv2.COLOR_BGR2GRAY), cv2.TM_CCOEFF_NORMED)
+        res = cv2.matchTemplate(img, cv2.cvtColor(template, cv2.COLOR_RGB2GRAY), cv2.TM_CCOEFF_NORMED)
 
 
         THRESHOLD = 0.90
@@ -89,7 +86,7 @@ class Util:
         return False, None, None
     
     def locate_mob_dot(img: np.ndarray):
-        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
         frame_threshold = cv2.inRange(hsv,*Util.HSVMask[HSVMaskEnum.MOB_DOT])
 
         res = cv2.matchTemplate(Assets.MobDot, frame_threshold, cv2.TM_CCOEFF_NORMED)

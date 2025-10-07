@@ -58,7 +58,7 @@ class DailyTask(Procedure):
                 SingleAction(interface.press, function_params=['f4']),
                 SingleAction(interface.detect_and_click, function_params=[SignalTypeEnum.TASK_MARK]),
                 SingleAction(interface.goto_mob)
-            ], ProgressEnum.REACH_FIELD, True),
+            ], ProgressEnum.REACH_FIELD, False),
             ProgressEnum.REACH_FIELD: ([
                 SingleAction(interface.is_reached)
             ], ProgressEnum.START_TASK, False),
@@ -106,7 +106,7 @@ class DailyTask(Procedure):
                 SingleAction(interface.set_timer),
                 SingleAction(interface.elapse, function_params=[3]),
                 SingleAction(interface.press, function_params=['f'])
-            ], ProgressEnum.GOTO_BASE)
+            ], ProgressEnum.GOTO_BASE, True)
         }
         
     def reduce_task_count(self):

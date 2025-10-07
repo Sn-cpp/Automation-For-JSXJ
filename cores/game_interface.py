@@ -1,7 +1,10 @@
 from win32gui import GetWindowRect, SetForegroundWindow
-import pyautogui as pyg
 import numpy as np
-from time import time
+
+import pydirectinput as dv_input
+from zbl import Capture
+
+from time import time, sleep
 
 import cv2
 
@@ -16,6 +19,7 @@ class GameInteface:
     def __init__(self, client_hwnd: int, foot_fight: bool):
         self.hwnd = client_hwnd
         self.update_client_rect()
+
         self.screenshot = None
 
         self.timer = None
@@ -31,7 +35,8 @@ class GameInteface:
         return True
         
     def capture_client(self):
-        self.screenshot = np.asarray(pyg.screenshot(region=[self.left, self.top, self.width, self.height]))
+        with Capture(window_handle=self.hwnd) as sct:
+            self.screenshot = sct.grab()
 
     def client_rect_change(self):
         new_rect = list(GetWindowRect(self.hwnd))
@@ -70,14 +75,14 @@ class GameInteface:
         return self.center_y + self.top if global_offset else self.center_y
 
     def goto_npc(self, npc_name: str):
-        pyg.click(self.get_center_x(True), self.get_center_y(True))
-        pyg.press('tab')
-        pyg.sleep(0.5)
-        pyg.click(self.get_center_x(True) + 277, self.get_center_y(True)  + 345)
-        pyg.typewrite(npc_name)
-        pyg.sleep(0.2)
-        pyg.press('enter')
-        pyg.sleep(0.2)
+        dv_input.click(self.get_center_x(True), self.get_center_y(True))
+        dv_input.press('tab')
+        sleep(0.5)
+        dv_input.click(self.get_center_x(True) + 277, self.get_center_y(True)  + 345)
+        dv_input.typewrite(npc_name)
+        sleep(0.2)
+        dv_input.press('enter')
+        sleep(0.2)
      
         self.dist = float('inf')
 
@@ -85,11 +90,12 @@ class GameInteface:
     
     def is_reach_npc(self):
         self.capture_client()
-        template = cv2.cvtColor(self.screenshot, cv2.COLOR_BGR2HSV)
-    
+        template = cv2.cvtColor(self.screenshot, cv2.COLOR_RGB2HSV)
+
         thresh_flag = cv2.bitwise_not(cv2.inRange(template, (92, 200, 136), (125, 255, 255)))
         thresh_marker = cv2.bitwise_not(cv2.inRange(template, (56, 86, 147), (74, 255, 255)))
 
+        cv2.imwrite('test.png', thresh_flag)
         
 
         marker_res = cv2.matchTemplate(Assets.PlayerMarker, thresh_marker, cv2.TM_CCOEFF_NORMED)
@@ -116,8 +122,8 @@ class GameInteface:
         return False
 
     def click_center(self):
-        pyg.sleep(0.2)
-        pyg.click(self.get_center_x(True), self.get_center_y(True))
+        sleep(0.2)
+        dv_input.click(self.get_center_x(True), self.get_center_y(True))
         return True
 
     # def click(self, x, y):
@@ -125,7 +131,7 @@ class GameInteface:
     #     return True
 
     def click_from_center(self, dx: int = 0, dy: int = 0):
-        pyg.click(self.get_center_x(True) + dx, self.get_center_y(True) + dy)
+        dv_input.click(self.get_center_x(True) + dx, self.get_center_y(True) + dy)
         return True
 
     def move(self, dx: int = 0, dy: int = 0):
@@ -133,7 +139,7 @@ class GameInteface:
         return True
 
     def press(self, key: str):
-        pyg.press(key)
+        dv_input.press(key)
         return True
 
     def check_location(self, location: str):
@@ -160,12 +166,12 @@ class GameInteface:
 
     def is_reached(self):
         if self.count == 0:
-            pyg.press('tab')
-            pyg.sleep(0.2)
+            dv_input.press('tab')
+            sleep(0.2)
             self.count = 1
         self.capture_client()
 
-        template = cv2.cvtColor(self.screenshot, cv2.COLOR_BGR2HSV)
+        template = cv2.cvtColor(self.screenshot, cv2.COLOR_RGB2HSV)
     
         thresh_flag = cv2.bitwise_not(cv2.inRange(template, (104, 118, 161), (116, 236, 255)))
 
@@ -178,8 +184,8 @@ class GameInteface:
                 self.count += 1
                 if self.count == 4:
                     self.count = 0
-                    pyg.press('tab')
-                    pyg.sleep(0.5)
+                    dv_input.press('tab')
+                    sleep(0.5)
                     return True
         
         return False
@@ -192,17 +198,17 @@ class GameInteface:
         #     if self.count == 3:
         #         self.count = 0
         #         self.old_pos = None
-        #         pyg.press('tab')
+        #         dv_input.press('tab')
         #         return True
         # else:
         #     self.count = 0
         #     self.old_pos = pos
-        #     pyg.sleep(1)
+        #     sleep(1)
 
         return False
 
         if self.check_location(coord=self.target_coord):
-            pyg.sleep(1)
+            sleep(1)
             self.capture_client()
             if self.check_location(coord=self.target_coord):
                 return True
@@ -219,11 +225,11 @@ class GameInteface:
         self.capture_client()
         if signal_type == SignalTypeEnum.NPC_DIALOG:
             flag, x, y = Util.locate_img(Assets.DialogBoxSignal, self.screenshot[self.center_y-246:self.center_y+239, self.center_x-445:self.center_x-50])
-            pyg.sleep(0.4)
+            sleep(0.4)
             return flag
         elif signal_type == SignalTypeEnum.REWARD:
             flag, x, y = Util.locate_img(Assets.FameReward, self.screenshot[self.center_y-331:, self.center_x-240 : self.center_x+100])
-            pyg.sleep(0.4)
+            sleep(0.4)
             return flag
         return False
     
@@ -232,7 +238,7 @@ class GameInteface:
         if signal_type == SignalTypeEnum.TASK_MARK:
             flag, x, y = Util.locate_img(Assets.TaskSignal, self.screenshot[self.center_y-246:self.center_y+189, :self.center_x-200])
             if flag:
-                pyg.click(self.left + x, self.get_center_y(True) -246 + y)
+                dv_input.click(self.left + x, self.get_center_y(True) -246 + y)
                 return flag
             
         return False
@@ -243,37 +249,37 @@ class GameInteface:
         
         if text != None:
             if 'Lang' in text:
-                pyg.press('f4')
-                pyg.press('tab')
-                pyg.sleep(0.2)
+                dv_input.press('f4')
+                dv_input.press('tab')
+                sleep(0.2)
                 self.click_from_center(-340, 110)
                 self.reach = False
-                pyg.press('tab')
-                pyg.sleep(0.2)
+                dv_input.press('tab')
+                sleep(0.2)
             elif 'Du' in text:
-                pyg.press('f4')
-                pyg.press('tab')
-                pyg.sleep(0.2)
+                dv_input.press('f4')
+                dv_input.press('tab')
+                sleep(0.2)
                 self.click_from_center(366, -147)
                 self.reach = False
-                pyg.press('tab')
-                pyg.sleep(0.2)
+                dv_input.press('tab')
+                sleep(0.2)
             elif 'Son' in text or 'Sơn' in text:
-                pyg.press('f4')
-                pyg.press('tab')
-                pyg.sleep(0.2)
+                dv_input.press('f4')
+                dv_input.press('tab')
+                sleep(0.2)
                 self.click_from_center(134, -220)
                 self.reach = False
-                pyg.press('tab')
-                pyg.sleep(0.2)
+                dv_input.press('tab')
+                sleep(0.2)
             elif 'Thủ' in text:
-                pyg.press('f4')
-                pyg.press('tab')
-                pyg.sleep(0.2)
+                dv_input.press('f4')
+                dv_input.press('tab')
+                sleep(0.2)
                 self.click_from_center(337, 60)
                 self.reach = False
-                pyg.press('tab')
-                pyg.sleep(0.2)
+                dv_input.press('tab')
+                sleep(0.2)
             else:
                 return False
             return True
@@ -291,7 +297,7 @@ class GameInteface:
         return False
     
     def is_task_complete(self):
-        pyg.sleep(0.3)
+        sleep(0.3)
         self.capture_client()
         text = Util.read_mission_text(self.screenshot[self.center_y+160:self.center_y+200, self.center_x-205:self.center_x+140])
         self.press('f4')
@@ -307,16 +313,16 @@ class GameInteface:
         mean_dot = Util.locate_mob_dot(self.screenshot[75: 175, -130:-30])
 
         if mean_dot != None:
-            pyg.click(self.left + self.width - 130 + mean_dot[0], self.top + 75 + mean_dot[1])
-            pyg.sleep(1)
+            dv_input.click(self.left + self.width - 130 + mean_dot[0], self.top + 75 + mean_dot[1])
+            sleep(1)
             
-        pyg.press('f')
+        dv_input.press('f')
  
         return False
     
     def get_on_horse(self):
         if self.foot_fight:
-            pyg.press('m')
+            dv_input.press('m')
         return True
     
     def test(self):

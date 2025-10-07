@@ -1,5 +1,6 @@
 from win32gui import GetForegroundWindow, SetForegroundWindow
-import pyautogui as pyg
+from time import sleep
+import pydirectinput as dv_input
 import keyboard as kb
 
 from cores.game_interface import GameInteface
@@ -25,7 +26,7 @@ class Client:
             return True
         
         self.set_active()
-        pyg.sleep(0.3)
+        sleep(0.3)
 
         while GetForegroundWindow() != self.hwnd:
             if kb.is_pressed('space'):
@@ -40,6 +41,6 @@ class Client:
         return False
 
     def set_active(self):
-        pyg.press('alt')
+        dv_input.press('alt')
         SetForegroundWindow(self.hwnd)
-        pyg.press('alt')
+        dv_input.press('alt')
