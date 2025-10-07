@@ -97,6 +97,9 @@ class GameInteface:
 
         return True
     
+    def resize_asset(self, asset: np.ndarray):
+        return Util.resize_asset(asset, (self.offset_v(asset.shape[1]), self.offset_h(asset.shape[0])))
+
     def is_reach_npc(self):
         self.capture_client()
         template = cv2.cvtColor(self.screenshot, cv2.COLOR_RGB2HSV)
@@ -104,12 +107,12 @@ class GameInteface:
         thresh_flag = cv2.bitwise_not(cv2.inRange(template, (92, 200, 136), (125, 255, 255)))
         thresh_marker = cv2.bitwise_not(cv2.inRange(template, (56, 86, 147), (74, 255, 255)))
 
-        marker_res = cv2.matchTemplate(Assets.PlayerMarker, thresh_marker, cv2.TM_CCOEFF_NORMED)
-        flag_res = cv2.matchTemplate(Assets.NpcFlag_R, thresh_flag, cv2.TM_CCOEFF_NORMED)
-        if marker_res.max() > 0.7:
-            if flag_res.max() <= 0.7:
-                flag_res = cv2.matchTemplate(Assets.NpcFlag_L, thresh_flag, cv2.TM_CCOEFF_NORMED)
-                if flag_res.max() < 0.7:
+        marker_res = cv2.matchTemplate(self.resize_asset(Assets.PlayerMarker), thresh_marker, cv2.TM_CCOEFF_NORMED)
+        flag_res = cv2.matchTemplate(self.resize_asset(Assets.NpcFlag_R), thresh_flag, cv2.TM_CCOEFF_NORMED)
+        if marker_res.max() > 0.5:
+            if flag_res.max() <= 0.5:
+                flag_res = cv2.matchTemplate(self.resize_asset(Assets.NpcFlag_L), thresh_flag, cv2.TM_CCOEFF_NORMED)
+                if flag_res.max() < 0.5:
                     return False
             
             flag_pos = np.unravel_index(flag_res.argmax(), flag_res.shape)
@@ -181,7 +184,7 @@ class GameInteface:
     
         thresh_flag = cv2.bitwise_not(cv2.inRange(template, (104, 118, 161), (116, 236, 255)))
 
-        flag_res = cv2.matchTemplate(Assets.PositionFlag, thresh_flag, cv2.TM_CCOEFF_NORMED)
+        flag_res = cv2.matchTemplate(self.resize_asset(Assets.PositionFlag), thresh_flag, cv2.TM_CCOEFF_NORMED)
 
         if flag_res.max() > 0.7:
             self.count = 2
@@ -230,7 +233,7 @@ class GameInteface:
         
         self.capture_client()
         if signal_type == SignalTypeEnum.NPC_DIALOG:
-            flag, x, y = Util.locate_img(Assets.DialogBoxSignal, 
+            flag, x, y = Util.locate_img(self.resize_asset(Assets.DialogBoxSignal), 
                                          self.crop_screenshot(self.center_y-self.offset_v(246), self.center_y+self.offset_v(239), self.center_x-self.offset_h(445), self.center_x-self.offset_h(50))
                                         )
             sleep(0.4)
@@ -326,7 +329,10 @@ class GameInteface:
             return True
         
 
-        mean_dot = Util.locate_mob_dot(self.crop_screenshot(self.offset_v(75), self.offset_v(175), self.offset_h(-130), self.offset_h(-30)))
+        mean_dot = Util.locate_mob_dot(
+            self.crop_screenshot(self.offset_v(75), self.offset_v(175), self.offset_h(-130), self.offset_h(-30)),
+            Assets.MobDot
+        )
 
         if mean_dot != None:
             dv_input.click(self.left + self.width - self.offset_h(130) + mean_dot[0], self.top + self.offset_v(75) + mean_dot[1])

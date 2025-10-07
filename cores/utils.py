@@ -76,7 +76,7 @@ class Util:
         res = cv2.matchTemplate(img, cv2.cvtColor(template, cv2.COLOR_RGB2GRAY), cv2.TM_CCOEFF_NORMED)
 
 
-        THRESHOLD = 0.90
+        THRESHOLD = 0.75
         loc = np.where(res >= THRESHOLD)
 
 
@@ -85,11 +85,11 @@ class Util:
         
         return False, None, None
     
-    def locate_mob_dot(img: np.ndarray):
+    def locate_mob_dot(img: np.ndarray, mob_dot: np.ndarray):
         hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
         frame_threshold = cv2.inRange(hsv,*Util.HSVMask[HSVMaskEnum.MOB_DOT])
 
-        res = cv2.matchTemplate(Assets.MobDot, frame_threshold, cv2.TM_CCOEFF_NORMED)
+        res = cv2.matchTemplate(mob_dot, frame_threshold, cv2.TM_CCOEFF_NORMED)
         
         loc = np.where(res >= 0.6)
 
@@ -97,4 +97,7 @@ class Util:
             return None
         
         return int(np.mean(loc[1])), int(np.mean(loc[0]))
+    
+    def resize_asset(asset: np.ndarray, shape):
+        return cv2.resize(asset, shape, interpolation=cv2.INTER_LINEAR)
 

@@ -25,7 +25,7 @@ class ProgressEnum(Enum):
 
 class DailyTask(Procedure):
     def __init__(self, interface: GameInteface, num: int):
-        self.stage = ProgressEnum(value=0)
+        self.stage = ProgressEnum(value=5)
         self.step = 0
         
         self.tolerance = 0
