@@ -110,10 +110,10 @@ class GameInteface:
 
         marker_res = cv2.matchTemplate(self.resize_asset(Assets.PlayerMarker), thresh_marker, cv2.TM_CCOEFF_NORMED)
         flag_res = cv2.matchTemplate(self.resize_asset(Assets.NpcFlag_R), thresh_flag, cv2.TM_CCOEFF_NORMED)
-        if marker_res.max() > 0.5:
-            if flag_res.max() <= 0.5:
+        if marker_res.max() > 0.7:
+            if flag_res.max() <= 0.7:
                 flag_res = cv2.matchTemplate(self.resize_asset(Assets.NpcFlag_L), thresh_flag, cv2.TM_CCOEFF_NORMED)
-                if flag_res.max() < 0.5:
+                if flag_res.max() < 0.7:
                     return False
             
             flag_pos = np.unravel_index(flag_res.argmax(), flag_res.shape)
