@@ -1,19 +1,19 @@
 import keyboard as kb
 from time import sleep, time
-from threading import Thread
+from threading import Thread, Event
 
 from cores.client import Client
 from cores.utils import Util
 
 
-stop = False
+stop_event = Event()
 running = True
 
 def key_monitor():
-    global stop, running
+    global running
     esc_start = None
 
-    while not stop:
+    while not stop_event:
         if kb.is_pressed('space'):
             running = not running
             print(f"Toggled running: {running}")
@@ -22,7 +22,6 @@ def key_monitor():
             if esc_start is None:
                 esc_start = time()
             elif time() - esc_start >= 3.0:
-                stop = True
                 print("Exiting")
         else:
             esc_start = None
@@ -45,25 +44,23 @@ if __name__ == "__main__":
     monitor_thread = Thread(target=key_monitor)
     monitor_thread.start()
 
-    while not stop:
+    try:
+        while not stop_event.is_set():
+            if running:
+                done = True
 
-        if running:
-            done = True
+                sleep(0.2) 
+                for client, _ in clients.values():
+                    if not client.execute():  
+                        done = False
+                    sleep(0.2)
+                if done:
+                    stop_event.set()
+    except Exception as e:
+        stop_event.set()
+        print(e)
 
-            sleep(0.2) 
-            for client, _ in clients.values():
-                if not client.execute():  
-                    done = False
-                sleep(0.2)
-            
-            if done:
-                stop = True
-
-
-    
-
-
-
+    monitor_thread.join()
 
 
 

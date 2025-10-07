@@ -38,6 +38,15 @@ class GameInteface:
         with Capture(window_handle=self.hwnd) as sct:
             self.screenshot = sct.grab()
 
+    def crop_screenshot(self, y_0 = 0, y_1 = None, x_0 = 0, x_1 = None):
+        return self.screenshot[y_0:y_1, x_0: x_1]
+
+    def offset_v(self, y):
+        return int(y * self.bottom / 741)
+
+    def offset_h(self, x):
+        return int(x * self.right / 982)
+
     def client_rect_change(self):
         new_rect = list(GetWindowRect(self.hwnd))
         Util.normalize_client_rect(new_rect)
@@ -75,10 +84,10 @@ class GameInteface:
         return self.center_y + self.top if global_offset else self.center_y
 
     def goto_npc(self, npc_name: str):
-        dv_input.click(self.get_center_x(True), self.get_center_y(True))
+        self.click_from_center()
         dv_input.press('tab')
         sleep(0.5)
-        dv_input.click(self.get_center_x(True) + 277, self.get_center_y(True)  + 345)
+        self.click_from_center(277, 345)
         dv_input.typewrite(npc_name)
         sleep(0.2)
         dv_input.press('enter')
@@ -94,9 +103,6 @@ class GameInteface:
 
         thresh_flag = cv2.bitwise_not(cv2.inRange(template, (92, 200, 136), (125, 255, 255)))
         thresh_marker = cv2.bitwise_not(cv2.inRange(template, (56, 86, 147), (74, 255, 255)))
-
-        cv2.imwrite('test.png', thresh_flag)
-        
 
         marker_res = cv2.matchTemplate(Assets.PlayerMarker, thresh_marker, cv2.TM_CCOEFF_NORMED)
         flag_res = cv2.matchTemplate(Assets.NpcFlag_R, thresh_flag, cv2.TM_CCOEFF_NORMED)
@@ -131,11 +137,11 @@ class GameInteface:
     #     return True
 
     def click_from_center(self, dx: int = 0, dy: int = 0):
-        dv_input.click(self.get_center_x(True) + dx, self.get_center_y(True) + dy)
+        dv_input.click(self.get_center_x(True) + self.offset_h(dx), self.get_center_y(True) + self.offset_v(dy))
         return True
 
     def move(self, dx: int = 0, dy: int = 0):
-        pyg.moveTo(self.get_center_x(True) + dx, self.get_center_y(True) + dy)
+        dv_input.moveTo(self.get_center_x(True) + self.offset_h(dx), self.get_center_y(True) + self.offset_v(dy))
         return True
 
     def press(self, key: str):
@@ -224,11 +230,15 @@ class GameInteface:
         
         self.capture_client()
         if signal_type == SignalTypeEnum.NPC_DIALOG:
-            flag, x, y = Util.locate_img(Assets.DialogBoxSignal, self.screenshot[self.center_y-246:self.center_y+239, self.center_x-445:self.center_x-50])
+            flag, x, y = Util.locate_img(Assets.DialogBoxSignal, 
+                                         self.crop_screenshot(self.center_y-self.offset_v(246), self.center_y+self.offset_v(239), self.center_x-self.offset_h(445), self.center_x-self.offset_h(50))
+                                        )
             sleep(0.4)
             return flag
         elif signal_type == SignalTypeEnum.REWARD:
-            flag, x, y = Util.locate_img(Assets.FameReward, self.screenshot[self.center_y-331:, self.center_x-240 : self.center_x+100])
+            flag, x, y = Util.locate_img(Assets.FameReward, 
+                                         self.crop_screenshot(self.center_y-self.offset_v(331), None, self.center_x-self.offset_h(240), self.center_x+self.offset_h(100))
+                                        )
             sleep(0.4)
             return flag
         return False
@@ -236,16 +246,20 @@ class GameInteface:
     def detect_and_click(self, signal_type: SignalTypeEnum, dx: int = 0, dy: int = 0):
         self.capture_client()
         if signal_type == SignalTypeEnum.TASK_MARK:
-            flag, x, y = Util.locate_img(Assets.TaskSignal, self.screenshot[self.center_y-246:self.center_y+189, :self.center_x-200])
+            flag, x, y = Util.locate_img(Assets.TaskSignal,
+                                         self.crop_screenshot(self.center_y-self.offset_v(246), self.center_y+self.offset_v(189), 0, self.center_x-self.offset_h(200))
+                                         )
             if flag:
-                dv_input.click(self.left + x, self.get_center_y(True) -246 + y)
+                dv_input.click(self.left + x, self.get_center_y(True) - self.offset_v(246) + y)
                 return flag
             
         return False
     
     def goto_mob(self):
         self.capture_client()
-        text = Util.read_mission_text(self.screenshot[self.center_y+160:self.center_y+200, self.center_x-205:self.center_x+140])
+        text = Util.read_mission_text(
+            self.crop_screenshot(self.center_y+self.offset_v(160), self.center_y+self.offset_v(200), self.center_x-self.offset_h(205), self.center_x+self.offset_h(140))
+        )
         
         if text != None:
             if 'Lang' in text:
@@ -299,7 +313,9 @@ class GameInteface:
     def is_task_complete(self):
         sleep(0.3)
         self.capture_client()
-        text = Util.read_mission_text(self.screenshot[self.center_y+160:self.center_y+200, self.center_x-205:self.center_x+140])
+        text = Util.read_mission_text(
+            self.crop_screenshot(self.center_y+self.offset_v(160), self.center_y+self.offset_v(200), self.center_x-self.offset_h(205), self.center_x+self.offset_h(140))
+        )
         self.press('f4')
 
         self.click_center()
@@ -310,10 +326,10 @@ class GameInteface:
             return True
         
 
-        mean_dot = Util.locate_mob_dot(self.screenshot[75: 175, -130:-30])
+        mean_dot = Util.locate_mob_dot(self.crop_screenshot(self.offset_v(75), self.offset_v(175), self.offset_h(-130), self.offset_h(-30)))
 
         if mean_dot != None:
-            dv_input.click(self.left + self.width - 130 + mean_dot[0], self.top + 75 + mean_dot[1])
+            dv_input.click(self.left + self.width - self.offset_h(130) + mean_dot[0], self.top + self.offset_v(75) + mean_dot[1])
             sleep(1)
             
         dv_input.press('f')
@@ -325,5 +341,3 @@ class GameInteface:
             dv_input.press('m')
         return True
     
-    def test(self):
-        return self.screenshot[self.height-170: self.height-130, 44:100]

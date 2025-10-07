@@ -33,6 +33,7 @@ dependencies:
   - python=3.12.3=h2628c8c_0_cpython
   - python-mss=10.0.0=pyhd8ed1ab_1
   - python_abi=3.12=7_cp312
+  - pywin32=311=py312h885b0b7_0
   - setuptools=78.1.1=py312haa95532_0
   - six=1.17.0=pyhd8ed1ab_0
   - sqlite=3.45.3=h2bbff1b_0
@@ -69,7 +70,6 @@ dependencies:
       - pyside6-addons==6.9.1
       - pyside6-essentials==6.9.1
       - pytweening==1.2.0
-      - pywin32==310
       - shiboken6==6.9.1
       - typing-extensions==4.15.0
       - window-input==1.7
