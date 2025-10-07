@@ -7,7 +7,7 @@ channels:
   - https://repo.anaconda.com/pkgs/msys2
 dependencies:
   - bzip2=1.0.8=h2bbff1b_6
-  - ca-certificates=2025.4.26=h4c7d964_0
+  - ca-certificates=2025.9.9=haa95532_0
   - comtypes=1.4.11=py312h2e8e312_0
   - expat=2.7.0=he0c23c2_0
   - freeglut=3.4.0=h8a1e904_1
@@ -33,7 +33,6 @@ dependencies:
   - python=3.12.3=h2628c8c_0_cpython
   - python-mss=10.0.0=pyhd8ed1ab_1
   - python_abi=3.12=7_cp312
-  - pywinauto=0.6.9=py312h2e8e312_0
   - setuptools=78.1.1=py312haa95532_0
   - six=1.17.0=pyhd8ed1ab_0
   - sqlite=3.45.3=h2bbff1b_0
@@ -48,20 +47,21 @@ dependencies:
   - zlib=1.2.13=h2466b09_6
   - zstd=1.5.6=h8880b57_0
   - pip:
-      - dxcam==0.0.5
       - keyboard==0.13.5
       - mouseinfo==0.1.3
       - numpy==2.2.6
       - opencv-contrib-python==4.11.0.86
       - opencv-python==4.5.5.62
-      - pyautogui==0.9.54
+      - psutil==7.1.0
+      - pydirectinput==1.0.4
       - pygetwindow==0.0.9
       - pymsgbox==1.0.9
       - pynput==1.8.1
       - pyperclip==1.9.0
       - pyqt5-qt5==5.15.2
       - pyqt5-sip==12.17.0
-      - pyqt6-qt6==6.9.1
+      - pyqt6==6.9.1
+      - pyqt6-qt6==6.9.2
       - pyqt6-sip==13.10.2
       - pyrect==0.2.0
       - pyscreeze==1.0.1
@@ -69,6 +69,13 @@ dependencies:
       - pyside6-addons==6.9.1
       - pyside6-essentials==6.9.1
       - pytweening==1.2.0
-      - pywin32==311
+      - pywin32==310
       - shiboken6==6.9.1
+      - typing-extensions==4.15.0
+      - window-input==1.7
+      - windows-capture==1.5.0
+      - winrt-runtime==3.2.1
+      - winrt-windows-graphics-capture==3.2.1
+      - winsdk==1.0.0b10
+      - zbl==0.7.0
 prefix: C:\ProgramData\anaconda3\envs\jsxj

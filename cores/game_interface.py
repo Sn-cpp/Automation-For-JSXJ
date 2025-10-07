@@ -127,7 +127,7 @@ class GameInteface:
         return True
 
     # def click(self, x, y):
-    #     pyg.moveTo(self.left + x, self.top + y)
+    #     dv_input.moveTo(self.left + x, self.top + y)
     #     return True
 
     def click_from_center(self, dx: int = 0, dy: int = 0):
