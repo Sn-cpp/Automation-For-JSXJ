@@ -98,6 +98,7 @@ class GameInteface:
         return True
     
     def resize_asset(self, asset: np.ndarray):
+        return asset
         return Util.resize_asset(asset, (self.offset_v(asset.shape[1]), self.offset_h(asset.shape[0])))
 
     def is_reach_npc(self):
