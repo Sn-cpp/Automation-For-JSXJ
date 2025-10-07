@@ -15,5 +15,6 @@ python main.py
 ## Notes
 - If you encounter a ImportError with `win32api`, try to reinstall it using
 ````
-pip install pywin32
+conda uninstall pywin32
+conda install pywin32
 ```` 
